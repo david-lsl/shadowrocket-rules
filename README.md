@@ -44,7 +44,7 @@ DNS：https://cloudflare-dns.com/dns-query, https://dns.google/dns-query
 
 ## 4 AWS EC2 设置
 
-### 4.1 BBR
+### 4.1 TCP keepalive
 
 修改 /etc/sysctl.conf
 
@@ -106,3 +106,64 @@ sudo netplan apply
 ```shell
 ip link show <your env>
 ```
+
+### 4.3 BBR
+
+#### 查看系统版本
+
+```shell
+cat /etc/os-release
+```
+
+PRETTY_NAME="Ubuntu 24.04.4 LTS"
+
+#### 修改 `/etc/modules-load.d/bbr.conf`
+
+```shell
+sudo vim /etc/modules-load.d/bbr.conf
+```
+
+写入：
+
+```shell
+tcp_bbr
+```
+
+#### 修改 `/etc/sysctl.conf`，新增
+
+```shell
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+```
+
+使生效：
+
+```shell
+sudo sysctl -p
+```
+
+#### 启动 tcp_bbr
+
+```
+sudo modprobe tcp_bbr
+```
+
+#### 查询 BBR
+
+```shell
+sysctl net.ipv4.tcp_congestion_control
+```
+
+net.ipv4.tcp_congestion_control = bbr
+
+```shell
+lsmod | grep bbr
+```
+
+tcp_bbr                20480  15
+
+看到这两条输出，说明：
+
+- BBR 内核模块已加载
+- fq 调度器已启用
+- congestion control 已切换为 BBR
