@@ -41,3 +41,68 @@ DNS：https://cloudflare-dns.com/dns-query, https://dns.google/dns-query
 超时：10秒
 根据Ping排序：关闭
 ```
+
+## 4 AWS EC2 设置
+
+### 4.1 BBR
+
+修改 /etc/sysctl.conf
+
+```shell
+vim  /etc/sysctl.conf
+```
+
+新增：
+
+```shell
+net.ipv4.tcp_keepalive_time = 120
+net.ipv4.tcp_keepalive_intvl = 30
+net.ipv4.tcp_keepalive_probes = 5
+```
+
+使生效：
+
+```shell
+sudo sysctl -p
+```
+
+### 4.2 MTU 1400 
+
+修改 /etc/netplan
+
+```shell
+ls /etc/netplan
+```
+
+比如显示：50-cloud-init.yaml，修改
+
+```shell
+vim /etc/netplan/50-cloud-init.yaml 
+```
+
+写入：
+
+```shell
+network:
+  version: 2
+  ethernets:
+    ens5:
+      match:
+        macaddress: "06:31:aa:50:3d:33"
+      set-name: "ens5"
+      dhcp4: true
+      dhcp6: false
+      mtu: 1400
+```
+
+使得生效：
+
+```shell
+sudo netplan apply
+```
+
+查询：
+
+```shell
+ip link show ens5
+```
