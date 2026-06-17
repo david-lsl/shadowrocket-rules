@@ -86,9 +86,9 @@ vim /etc/netplan/50-cloud-init.yaml
 network:
   version: 2
   ethernets:
-    ens5:
+    <your env>:
       match:
-        macaddress: "06:31:aa:50:3d:33"
+        macaddress: "<your-macaddress>"
       set-name: "ens5"
       dhcp4: true
       dhcp6: false
@@ -104,5 +104,5 @@ sudo netplan apply
 查询：
 
 ```shell
-ip link show ens5
+ip link show <your env>
 ```
